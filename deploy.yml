@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: True
+  tasks:
+    - name: 'setup'
+      setup:
+        filter: '*'
+
+- hosts: all
+  become: True
+  roles:
+    - { role: node, tags: [ 'node' ] }
+    - { role: database, tags: [ 'database' ] }
+    - { role: nci, tags: [ 'webapp' ] }
+    - { role: projects, tags: [ 'projects' ] }
+  vars_files:
+    - vars/secure_vars.yml

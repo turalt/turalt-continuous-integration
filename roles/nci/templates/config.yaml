@@ -1,0 +1,47 @@
+
+plugins:
+    - nci-projects-reloader
+    - nci-static-server
+    - nci-rest-api-server
+    - nci-mail-notification
+    - nci-scheduler
+    #ui better be last plugin
+    - nci-classic-ui
+
+nodes:
+    - type: local
+      #allow maximum 3 parallel builds
+      maxExecutorsCount: {{max_executors}}
+
+http:
+    host: 0.0.0.0
+    port: "{{server_port}}"
+    url: "http://{{server_host}}:{{server_port}}"
+
+    static:
+        #this settings will be consumed by static server plugin
+        locations:
+            #serve static for ui plugin
+            - url: /favicon.ico
+              root: node_modules/nci-classic-ui/static/
+            - url: !!js/regexp ^/(js|css|fonts|images)/
+              root: node_modules/nci-classic-ui/static/
+            #serve project workspaces via http, remove lines
+            #below if don`t need/want that
+            - url: !!js/regexp ^/projects/(\w|-)+/workspace/
+              root: data/
+
+storage:
+    #use leveldown as db backend
+    backend: leveldown
+
+
+notify:
+    #configure account for sending notifications
+    #this settings will be consumed by mail notification plugin
+    mail:
+        host: "{{mail_smtp_host}}"
+        port: "{{mail_smtp_port}}"
+        auth:
+            user: "{{mail_smtp_auth_user}}"
+            pass: "{{mail_smtp_auth_password}}"

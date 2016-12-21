@@ -1,0 +1,38 @@
+---
+- name: MariaDB | Configure MariaDB Installation
+  debconf:
+    name: mariadb-server
+    question: "{{item}}"
+    vtype: password
+    value: "{{mariadb_root_password}}"
+  with_items:
+    - mysql-server/root_password
+    - mysql-server/root_password_again
+  register: configure_install
+
+- name: MariaDB | Install MariaDB
+  apt: name={{item}} update_cache=yes cache_valid_time=3600 state=present
+  with_items:
+  - mariadb-server
+  - python-mysqldb
+
+- name: MariaDB | Create the databases
+  mysql_db:
+    name: "{{item}}"
+    state: present
+    login_user: root
+    login_password: "{{mariadb_root_password}}"
+    encoding: 'utf8'
+    collation: 'utf8_unicode_ci'
+  with_items: "{{mariadb_databases}}"
+
+- name: MariaDB | Add an unprivileged user for the databases
+  mysql_user:
+    name: "{{mariadb_database_user}}"
+    host: localhost
+    password: "{{mariadb_database_password}}"
+    state: present
+    login_user: root
+    login_password: "{{mariadb_root_password}}"
+    priv: "{{item}}.*:ALL"
+  with_items: "{{mariadb_databases}}"

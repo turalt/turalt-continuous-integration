@@ -1,0 +1,19 @@
+{
+  "name": "turalt-continuous-integration",
+  "version": "1.0.0",
+  "description": "turalt continuous integration deployment",
+  "author": "Stuart Watt <stuart@morungos.com>",
+  "license": "MIT",
+  "dependencies": {
+    "forever": "0.15.1",
+    "leveldown": "1.4.6",
+    "nci": "latest",
+    "nci-classic-ui": "latest",
+    "nci-mail-notification": "latest",
+    "nci-projects-reloader": "latest",
+    "nci-rest-api-server": "latest",
+    "nci-scheduler": "latest",
+    "nci-static-server": "latest",
+    "nci-yaml-reader": "latest"
+  }
+}

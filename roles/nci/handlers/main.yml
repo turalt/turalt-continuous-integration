@@ -1,0 +1,4 @@
+---
+# file: roles/webapp/handlers/main.yml
+- name: restart service
+  service: name={{webapp_service_name}} state=restarted

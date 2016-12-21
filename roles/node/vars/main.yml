@@ -1,0 +1,5 @@
+---
+
+node_version: '6.9.1'
+node_base_url: 'https://nodejs.org/dist'
+node_architecture: 'linux-armv7l'

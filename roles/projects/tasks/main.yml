@@ -1,0 +1,14 @@
+---
+- name: Webapp | Create directories
+  file:
+    path: "{{webapp_directory}}/data/projects/{{item}}"
+    owner: "{{webapp_service_user}}"
+    state: "directory"
+  with_items: "{{project_list}}"
+
+- name: Webapp | Copy the files
+  copy:
+    src: "{{item}}.yml"
+    dest: "{{webapp_directory}}/data/projects/{{item}}/config.yaml"
+    owner: "{{webapp_service_user}}"
+  with_items: "{{project_list}}"

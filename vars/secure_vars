@@ -1,0 +1,26 @@
+---
+## Example secure variables. We normally keep these encrypted using
+## ansible-vault.
+
+mail_smtp_auth_user: 'xxx'
+mail_smtp_auth_password: 'xxx'
+mail_smtp_host: 'smtp.gmail.com'
+mail_smtp_port: 587
+
+mariadb_root_password: 'xxx'
+
+mariadb_database_user: turalt
+mariadb_database_password: xxx
+
+mariadb_databases:
+  - 'turalt_public'
+  - 'turalt'
+
+server_host: '10.0.1.203'
+server_port: '3000'
+
+project_list:
+  - turalt-public
+
+## Use deployment_key_domain and deployment_key for any deployment key
+## that you might need.

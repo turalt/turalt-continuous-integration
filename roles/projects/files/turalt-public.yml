@@ -1,0 +1,27 @@
+---
+scm:
+  type: git
+  repository: git+ssh://git@bitbucket.org/morungos/turalt-public.git
+  rev: develop
+
+buildEvery:
+  #build project every 5 minutes
+  time: "0 */5 * * * *"
+  #but only if there is scm changes
+  withScmChangesOnly: true
+
+#notify when build fails or build status changes (according to previous status)
+notify:
+  on:
+    - error
+    - change
+  to:
+    mail:
+      - stuart.watt@turalt.com
+
+steps:
+  - name: sync deps
+    cmd: npm install && npm prune
+
+  - name: test
+    cmd: npm run integration

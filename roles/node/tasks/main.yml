@@ -1,0 +1,33 @@
+---
+- name: Node.js | Installing packages
+  apt: pkg={{ item.package }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - { package: 'build-essential' }
+    - { package: 'libssl-dev' }
+    - { package: 'zlib1g-dev' }
+    - { package: 'openssl' }
+
+- name: Node.js | Get Node.js
+  get_url:
+    dest: '/tmp/node-latest.tar.gz'
+    url: '{{ node_base_url }}/v{{node_version}}/node-v{{node_version}}-{{node_architecture}}.tar.gz'
+
+- name: Node.js | Create directory
+  file:
+    path: "/tmp/node-latest-install"
+    state: directory
+
+- name: Node.js | Unpack Node.js
+  command: tar -x -z --strip-components=1 -f /tmp/node-latest.tar.gz chdir=/tmp/node-latest-install creates=/tmp/node-latest-install/bin
+
+- name: Node.js | Remove files
+  file:
+    path: "/tmp/node-latest-install/{{item}}"
+    state: 'absent'
+  with_items:
+    - "README.md"
+    - "CHANGELOG.md"
+    - "LICENSE"
+
+- name: Node.js | Deploy local node
+  shell: cp -rf /tmp/node-latest-install/* /usr/local/ creates=/usr/local/bin/node

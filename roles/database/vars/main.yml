@@ -1,0 +1,7 @@
+---
+mariadb_root_password: 'xxx'
+
+mariadb_databases: []
+
+mariadb_database_user: 'turalt'
+mariadb_database_password: 'xxx'

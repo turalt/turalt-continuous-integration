@@ -1,0 +1,12 @@
+---
+
+webapp_service_name: 'nci'
+webapp_service_user: '{{webapp_service_name}}'
+
+webapp_directory: '/usr/lib/turalt-ci'
+webapp_log_directory: '/var/log/{{webapp_service_name}}'
+webapp_pid_directory: '/var/run/{{webapp_service_name}}'
+
+webapp_service_init: '/etc/init.d/{{webapp_service_name}}'
+
+max_executors: 1

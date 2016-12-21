@@ -1,0 +1,83 @@
+---
+- name: Webapp | Install required components
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600 state=present
+  with_items:
+  - git
+
+- name: Webapp | Create directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+  with_items:
+    - { path: '{{webapp_directory}}' }
+    - { path: '{{webapp_directory}}/data' }
+    - { path: '{{webapp_directory}}/data/projects' }
+    - { path: '{{webapp_log_directory}}' }
+    - { path: '{{webapp_pid_directory}}' }
+
+- name: Webapp | Copy the files
+  copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  with_items:
+    - {src: 'package.json', dest: "{{webapp_directory}}/package.json"}
+    - {src: 'preload.json', dest: "{{webapp_directory}}/data/preload.json"}
+
+- name: Webapp | Template the templates
+  template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  with_items:
+    - {src: 'config.yaml', dest: "{{webapp_directory}}/data/config.yaml"}
+
+- name: Webapp | Run npm commands
+  command: npm {{item}} chdir={{webapp_directory}}
+  with_items:
+    - "install"
+
+- name: Webapp | Write scripts
+  template: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+  notify:
+    - restart service
+  with_items:
+    - { src: "nci.init.sh", dest: "{{webapp_service_init}}", mode: '0755' }
+
+- name: Webapp | Create user
+  user: name={{webapp_service_user}} comment="{{webapp_service_user}} webapp" state=present
+
+- name: Webapp | Assign files to the user
+  file: path={{ item.path }} recurse=yes owner={{webapp_service_user}} group=adm mode={{ item.mode }}
+  with_items:
+    - { path: '{{webapp_log_directory}}', mode: '0750' }
+    - { path: '{{webapp_pid_directory}}', mode: '0750' }
+    - { path: '{{webapp_directory}}', mode: '0750' }
+    - { path: '{{webapp_directory}}/data', mode: '0770' }
+
+## The key comes from a variable, which allows it to be handled by Ansible vault
+- name: Webapp | Create .ssh
+  file:
+    path: "~nci/.ssh"
+    state: directory
+    owner: "{{webapp_service_user}}"
+
+- name: Webapp | Copy deployment key file (if present)
+  copy:
+    content: "{{ deployment_key }}"
+    dest: "~nci/.ssh/turalt_deployment"
+    owner: "{{webapp_service_user}}"
+    mode: 0600
+  when: deployment_key is defined
+
+- name: Webapp | Install deployment keys (if present)
+  ssh_config:
+    host: "{{deployment_key_domain}}"
+    hostname: "{{deployment_key_domain}}"
+    user: "{{webapp_service_user}}"
+    remote_user: "git"
+    identity_file: "~nci/.ssh/turalt_deployment"
+    state: "present"
+    strict_host_key_checking: "no"
+  when: deployment_key is defined
+
+- name: Webapp | ensure the service is running
+  service: name={{webapp_service_name}} state=restarted enabled=yes
